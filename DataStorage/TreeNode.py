@@ -1,7 +1,12 @@
 import uuid
+import os
+import json
 
 NODE_FILE_EXTENSION = ".dstn"
 DATA_FILE_EXTENSION = ".dstd"
+DEFAULT_DATA_DIR_NAME = "Data"
+
+data_dir = os.path.join(os.path.split(__file__)[0],DEFAULT_DATA_DIR_NAME)
 
 class TreeNode:
     """Base tree node class that can store data in a seperate file. Meant to be inherited from."""
@@ -16,18 +21,39 @@ class TreeNode:
         self._left_child_uuid = None
         self._right_child_uuid = None
 
+        self._save_node()
+        self.set_data({})
+
     @classmethod
     def get_node(cls, uuid):
         """Reads a node from disk with the given uuid"""
-        pass
 
     def _save_node(self):
-        """called automatically after editing node properties"""
+        """called automatically after editing node properties, overwrites the node file to reflect changes"""
+        with open(os.path.join(data_dir,self._get_node_file_name()),"w") as node_file:
+            node_file.write(self._get_node_save_text())
 
     def get_data(self):
         """gets the data saved in this node"""
-        pass
     
     def set_data(self,data):
         """overwrites this node's data"""
-        pass
+
+    def _get_node_file_name(self):
+        return self.uuid + "." + NODE_FILE_EXTENSION
+
+    def _get_node_save_text(self): #separate method so child classes can append to
+        save_text = "{},{}\n".format(self.uuid,self._data_uuid)
+        save_text += "{},{}".format(self._left_child_uuid if self._left_child_uuid != None else "",
+                                    self._right_child_uuid if self._right_child_uuid != None else "")
+        return save_text
+
+def set_data_dir(dir):
+    global data_dir
+    data_dir = dir
+
+def _init():
+    if not os.path.isdir(data_dir): # TODO: make this only trigger when data is written and default directory is used, so it doesn't make the folder if a different directory is set
+        os.mkdir(data_dir)
+
+_init()
