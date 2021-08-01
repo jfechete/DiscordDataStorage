@@ -19,7 +19,10 @@ class TreeNode:
     def get_node(cls, uuid):
         """Reads a node from disk with the given uuid"""
         with open(os.path.join(data_dir,uuid + "." + NODE_FILE_EXTENSION),"r") as node_file:
-            pass
+            uuid, data_uuid = node_file.readline().replace("\n", "").split(",")
+            left_node, right_node = [child_uuid if child_uuid != "" else None
+                                     for child_uuid in node_file.readline().replace("\n","").split(",")]
+        return cls._constructor(uuid, data_uuid, left_node, right_node)
 
     @classmethod
     def _constructor(cls, uuid, data_uuid, left_child = None, right_child = None, self = None):
