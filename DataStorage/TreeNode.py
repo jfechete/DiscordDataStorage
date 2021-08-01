@@ -13,20 +13,29 @@ class TreeNode:
     
     def __init__(self):
         """Creates a new tree node (make sure to add it to a tree)"""
-        self.uuid = str(uuid.uuid4())
-
-        self._data_uuid = str(uuid.uuid4())
-
-        #don't think I'll need parent or root nodes within the node, I'll add them here if I do
-        self._left_child_uuid = None
-        self._right_child_uuid = None
-
-        self._save_node()
-        self.set_data({})
+        TreeNode._constructor(str(uuid.uuid4()),str(uuid.uuid4()),self = self)
 
     @classmethod
     def get_node(cls, uuid):
         """Reads a node from disk with the given uuid"""
+        with open(os.path.join(data_dir,uuid + "." + NODE_FILE_EXTENSION),"r") as node_file:
+            pass
+
+    @classmethod
+    def _constructor(cls, uuid, data_uuid, left_child = None, right_child = None, self = None):
+        if self == None:
+            self = cls.__new__(cls)
+
+        self.uuid = uuid
+        self._data_uuid = data_uuid
+        #don't think I'll need parent or root nodes within the node, I'll add them here if I do
+        self._left_child_uuid = left_child
+        self._right_child_uuid = right_child
+
+        self._save_node()
+        self.set_data(None)
+
+        return self
 
     def _save_node(self):
         """called automatically after editing node properties, overwrites the node file to reflect changes"""
