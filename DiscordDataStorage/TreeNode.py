@@ -6,6 +6,12 @@ NODE_FILE_EXTENSION = ".dstn"
 DATA_FILE_EXTENSION = ".dstd"
 DEFAULT_DATA_DIR_NAME = "Data"
 
+#Data keys
+UUID_KEY = "uuid"
+DATA_UUID_KEY = "data_uuid"
+LEFT_NODE_KEY = "left_child"
+RIGHT_NODE_KEY = "right_child"
+
 data_dir = os.path.join(os.path.split(__file__)[0],DEFAULT_DATA_DIR_NAME)
 
 class TreeNode:
@@ -22,10 +28,10 @@ class TreeNode:
         """Reads a node from disk with the given uuid"""
         with open(os.path.join(data_dir,uuid + "." + NODE_FILE_EXTENSION),"r") as node_file:
             data = json.load(node_file)
-        uuid = data["uuid"]
-        data_uuid = data["data_uuid"]
-        left_node = data["left_child"]
-        right_node = data["right_child"]
+        uuid = data[UUID_KEY]
+        data_uuid = data[DATA_UUID_KEY]
+        left_node = data[LEFT_NODE_KEY]
+        right_node = data[RIGHT_NODE_KEY]
         return cls._constructor(uuid, data_uuid, left_node, right_node)
 
     @classmethod
@@ -57,10 +63,10 @@ class TreeNode:
 
     def _get_node_save_data(self): #separate method so child classes can edit it
         save_data = {}
-        save_data["uuid"] = self.uuid
-        save_data["data_uuid"] = self._data_uuid
-        save_data["left_child"] = self._left_child_uuid
-        save_data["right_child"] = self._right_child_uuid
+        save_data[UUID_KEY] = self.uuid
+        save_data[DATA_UUID_KEY] = self._data_uuid
+        save_data[LEFT_NODE_KEY] = self._left_child_uuid
+        save_data[RIGHT_NODE_KEY] = self._right_child_uuid
         return save_data
 
     def __str__(self):
