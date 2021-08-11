@@ -14,14 +14,18 @@ class TreeNode:
     def __init__(self):
         """Creates a new tree node (make sure to add it to a tree)"""
         TreeNode._constructor(str(uuid.uuid4()),str(uuid.uuid4()),self = self)
+        self._save_node()
+        self.set_data(None)
 
     @classmethod
     def get_node(cls, uuid):
         """Reads a node from disk with the given uuid"""
         with open(os.path.join(data_dir,uuid + "." + NODE_FILE_EXTENSION),"r") as node_file:
-            uuid, data_uuid = node_file.readline().replace("\n", "").split(",")
-            left_node, right_node = [child_uuid if child_uuid != "" else None
-                                     for child_uuid in node_file.readline().replace("\n","").split(",")]
+            data = json.load(node_file)
+        uuid = data["uuid"]
+        data_uuid = data["data_uuid"]
+        left_node = data["left_child"]
+        right_node = data["right_child"]
         return cls._constructor(uuid, data_uuid, left_node, right_node)
 
     @classmethod
@@ -35,15 +39,12 @@ class TreeNode:
         self._left_child_uuid = left_child
         self._right_child_uuid = right_child
 
-        self._save_node()
-        self.set_data(None)
-
         return self
 
     def _save_node(self):
         """called automatically after editing node properties, overwrites the node file to reflect changes"""
         with open(os.path.join(data_dir,self._get_node_file_name()),"w") as node_file:
-            node_file.write(self._get_node_save_text())
+            json.dump(self._get_node_save_data(),node_file)
 
     def get_data(self):
         """gets the data saved in this node"""
@@ -54,11 +55,13 @@ class TreeNode:
     def _get_node_file_name(self):
         return self.uuid + "." + NODE_FILE_EXTENSION
 
-    def _get_node_save_text(self): #separate method so child classes can append to
-        save_text = "{},{}\n".format(self.uuid,self._data_uuid)
-        save_text += "{},{}".format(self._left_child_uuid if self._left_child_uuid != None else "",
-                                    self._right_child_uuid if self._right_child_uuid != None else "")
-        return save_text
+    def _get_node_save_data(self): #separate method so child classes can edit it
+        save_data = {}
+        save_data["uuid"] = self.uuid
+        save_data["data_uuid"] = self._data_uuid
+        save_data["left_child"] = self._left_child_uuid
+        save_data["right_child"] = self._right_child_uuid
+        return save_data
 
     def __str__(self):
         return self.uuid
