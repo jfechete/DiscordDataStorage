@@ -60,6 +60,23 @@ class TreeNode:
                                     self._right_child_uuid if self._right_child_uuid != None else "")
         return save_text
 
+    def __str__(self):
+        return self.uuid
+
+    def str_tree(self, first_start = "", body_start = ""): # TODO: test more after adding child_add method
+        """gets a string representation of this node and it's children"""
+        str_self = first_start + str(self)
+        left_child = self.get_child(self._left_child_uuid)
+        str_left_child = body_start + (left_child.str_tree(body_start + "├", body_start + "│") if left_child else "├" + str(left_child))
+        right_child = self.get_child(self._right_child_uuid)
+        str_right_child = body_start + (right_child.str_tree(body_start + "└", body_start + " ") if right_child else "└" + str(right_child))
+        return "\n".join((str_self,str_left_child,str_right_child))
+
+    def get_child(self, child):
+        if child == None:
+            return None
+        return self.__class__.get_node(child)
+
 def set_data_dir(dir):
     global data_dir
     data_dir = dir
