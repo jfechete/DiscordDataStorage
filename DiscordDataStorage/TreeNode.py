@@ -11,15 +11,16 @@ UUID_KEY = "uuid"
 DATA_UUID_KEY = "data_uuid"
 LEFT_NODE_KEY = "left_child"
 RIGHT_NODE_KEY = "right_child"
+ID_KEY = "id"
 
 data_dir = os.path.join(os.path.split(__file__)[0],DEFAULT_DATA_DIR_NAME)
 
 class TreeNode:
     """Base tree node class that can store data in a seperate file. Meant to be inherited from."""
     
-    def __init__(self):
+    def __init__(self, id):
         """Creates a new tree node (make sure to add it to a tree)"""
-        TreeNode._constructor(str(uuid.uuid4()),str(uuid.uuid4()),self = self)
+        TreeNode._constructor(str(uuid.uuid4()),str(uuid.uuid4()),id,self = self)
         self._save_node()
         self.set_data(None)
 
@@ -32,15 +33,17 @@ class TreeNode:
         data_uuid = data[DATA_UUID_KEY]
         left_node = data[LEFT_NODE_KEY]
         right_node = data[RIGHT_NODE_KEY]
-        return cls._constructor(uuid, data_uuid, left_node, right_node)
+        id = data[ID_KEY]
+        return cls._constructor(uuid, data_uuid, id, left_node, right_node)
 
     @classmethod
-    def _constructor(cls, uuid, data_uuid, left_child = None, right_child = None, self = None):
+    def _constructor(cls, uuid, data_uuid, id, left_child = None, right_child = None, self = None):
         if self == None:
             self = cls.__new__(cls)
 
         self.uuid = uuid
         self._data_uuid = data_uuid
+        self.id = id
         #don't think I'll need parent or root nodes within the node, I'll add them here if I do
         self._left_child_uuid = left_child
         self._right_child_uuid = right_child
@@ -67,10 +70,11 @@ class TreeNode:
         save_data[DATA_UUID_KEY] = self._data_uuid
         save_data[LEFT_NODE_KEY] = self._left_child_uuid
         save_data[RIGHT_NODE_KEY] = self._right_child_uuid
+        save_data[ID_KEY] = self.id
         return save_data
 
     def __str__(self):
-        return self.uuid
+        return str(self.id)
 
     def str_tree(self, first_start = "", body_start = ""): # TODO: test more after adding child_add method
         """gets a string representation of this node and it's children"""
