@@ -27,14 +27,20 @@ class TreeNode:
     @classmethod
     def get_node(cls, uuid):
         """Reads a node from disk with the given uuid"""
-        with open(os.path.join(data_dir,uuid + "." + NODE_FILE_EXTENSION),"r") as node_file:
-            data = json.load(node_file)
+        data = cls._get_node_data(uuid)
         uuid = data[UUID_KEY]
         data_uuid = data[DATA_UUID_KEY]
         left_node = data[LEFT_NODE_KEY]
         right_node = data[RIGHT_NODE_KEY]
         id = data[ID_KEY]
         return cls._constructor(uuid, data_uuid, id, left_node, right_node)
+
+    @classmethod
+    def _get_node_data(cls, uuid):
+        with open(os.path.join(data_dir,uuid + "." + NODE_FILE_EXTENSION),"r") as node_file:
+            data = json.load(node_file)
+        return data
+
 
     @classmethod
     def _constructor(cls, uuid, data_uuid, id, left_child = None, right_child = None, self = None):
