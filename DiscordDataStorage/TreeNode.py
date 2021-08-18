@@ -66,6 +66,24 @@ class TreeNode:
     def set_data(self,data):
         """overwrites this node's data"""
 
+    def add_child(self, child): #TODO: check if test worked after fixing str_tree method
+        """adds a child node to this tree"""
+        if self == child:
+            raise ValueError("Child already has same id in tree")
+        if self < child:
+            if self._right_child_uuid == None:
+                self._right_child_uuid = child.uuid
+                self._save_node()
+            else:
+                self._get_child(self._right_child_uuid).add_child(child)
+        else:
+            if self._left_child_uuid == None:
+                self._left_child_uuid = child.uuid
+                self._save_node()
+            else:
+                self._get_child(self._left_child_uuid).add_child(child)
+
+
     def str_tree(self, first_start = "", body_start = ""): # TODO: test more after adding child_add method
         """gets a string representation of this node and it's children"""
         str_self = first_start + str(self)
