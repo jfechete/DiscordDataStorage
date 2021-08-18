@@ -1,7 +1,9 @@
+#Modules
 import uuid
 import os
 import json
 
+#Constants
 NODE_FILE_EXTENSION = ".dstn"
 DATA_FILE_EXTENSION = ".dstd"
 DEFAULT_DATA_DIR_NAME = "Data"
@@ -13,8 +15,10 @@ LEFT_NODE_KEY = "left_child"
 RIGHT_NODE_KEY = "right_child"
 ID_KEY = "id"
 
+#Variables
 data_dir = os.path.join(os.path.split(__file__)[0],DEFAULT_DATA_DIR_NAME)
 
+#Main class
 class TreeNode:
     """Base tree node class that can store data in a seperate file. Meant to be inherited from."""
     
@@ -56,16 +60,66 @@ class TreeNode:
 
         return self
 
-    def _save_node(self):
-        """called automatically after editing node properties, overwrites the node file to reflect changes"""
-        with open(os.path.join(data_dir,self._get_node_file_name()),"w") as node_file:
-            json.dump(self._get_node_save_data(),node_file)
-
     def get_data(self):
         """gets the data saved in this node"""
     
     def set_data(self,data):
         """overwrites this node's data"""
+
+    def str_tree(self, first_start = "", body_start = ""): # TODO: test more after adding child_add method
+        """gets a string representation of this node and it's children"""
+        str_self = first_start + str(self)
+        left_child = self._get_child(self._left_child_uuid)
+        str_left_child = body_start + (left_child.str_tree(body_start + "├", body_start + "│") if left_child else "├" + str(left_child))
+        right_child = self._get_child(self._right_child_uuid)
+        str_right_child = body_start + (right_child.str_tree(body_start + "└", body_start + " ") if right_child else "└" + str(right_child))
+        return "\n".join((str_self,str_left_child,str_right_child))
+
+    def __str__(self):
+        return str(self.id)
+
+    def __eq__(self,other):
+        if isinstance(other,TreeNode):
+            return self.id == other.id
+        elif isinstance(other, int):
+            return self.id == other
+        else:
+            return NotImplemented
+    
+    def __lt__(self,other):
+        if isinstance(other, TreeNode):
+            return self.id < other.id
+        elif isinstance(other, int):
+            return self.id < other
+        else:
+            return NotImplemented
+
+    def __ne__(self,other):
+        eq = self.__eq__(other)
+        return not eq if eq != NotImplemented else eq
+
+    def __gt__(self, other):
+        lt = self.__lt__(other)
+        return not lt if lt != NotImplemented else lt
+    
+    def __le__(self,other):
+        lt = self.__lt__(other)
+        eq = self.__eq__(other)
+        if lt == NotImplemented or eq == NotImplemented:
+            return NotImplemented
+        return lt or eq
+
+    def __ge__(self,other):
+        gt = self.__gt__(other)
+        eq = self.__eq__(other)
+        if gt == NotImplemented or eq == NotImplemented:
+            return NotImplemented
+        return gt or eq
+        
+    def _save_node(self):
+        """called automatically after editing node properties, overwrites the node file to reflect changes"""
+        with open(os.path.join(data_dir,self._get_node_file_name()),"w") as node_file:
+            json.dump(self._get_node_save_data(),node_file)
 
     def _get_node_file_name(self):
         return self.uuid + "." + NODE_FILE_EXTENSION
@@ -79,23 +133,12 @@ class TreeNode:
         save_data[ID_KEY] = self.id
         return save_data
 
-    def __str__(self):
-        return str(self.id)
-
-    def str_tree(self, first_start = "", body_start = ""): # TODO: test more after adding child_add method
-        """gets a string representation of this node and it's children"""
-        str_self = first_start + str(self)
-        left_child = self.get_child(self._left_child_uuid)
-        str_left_child = body_start + (left_child.str_tree(body_start + "├", body_start + "│") if left_child else "├" + str(left_child))
-        right_child = self.get_child(self._right_child_uuid)
-        str_right_child = body_start + (right_child.str_tree(body_start + "└", body_start + " ") if right_child else "└" + str(right_child))
-        return "\n".join((str_self,str_left_child,str_right_child))
-
-    def get_child(self, child):
+    def _get_child(self, child):
         if child == None:
             return None
         return self.__class__.get_node(child)
 
+#Methods
 def set_data_dir(dir):
     global data_dir
     data_dir = dir
