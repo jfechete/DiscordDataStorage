@@ -66,7 +66,7 @@ class TreeNode:
     def set_data(self,data):
         """overwrites this node's data"""
 
-    def add_child(self, child): #TODO: check if test worked after fixing str_tree method
+    def add_child(self, child):
         """adds a child node to this tree"""
         if self == child:
             raise ValueError("Child already has same id in tree")
@@ -84,13 +84,13 @@ class TreeNode:
                 self._get_child(self._left_child_uuid).add_child(child)
 
 
-    def str_tree(self, first_start = "", body_start = ""): # TODO: test more after adding child_add method
+    def str_tree(self, first_start = "", body_start = ""):
         """gets a string representation of this node and it's children"""
         str_self = first_start + str(self)
         left_child = self._get_child(self._left_child_uuid)
-        str_left_child = body_start + (left_child.str_tree(body_start + "├", body_start + "│") if left_child else "├" + str(left_child))
+        str_left_child = (left_child.str_tree(body_start + "├", body_start + "│") if left_child else body_start + "├" + str(left_child))
         right_child = self._get_child(self._right_child_uuid)
-        str_right_child = body_start + (right_child.str_tree(body_start + "└", body_start + " ") if right_child else "└" + str(right_child))
+        str_right_child = (right_child.str_tree(body_start + "└", body_start + " ") if right_child else body_start + "└" + str(right_child))
         return "\n".join((str_self,str_left_child,str_right_child))
 
     def __str__(self):
