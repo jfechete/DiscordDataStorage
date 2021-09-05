@@ -66,6 +66,19 @@ class TreeNode:
     def set_data(self,data):
         """overwrites this node's data"""
 
+    def get_child(self, id):
+        """gets the child node with the passed id"""
+        if self.id == id:
+            return self
+        elif self.id < id:
+            if self._right_child_uuid == None:
+                raise ValueError("Child not found")
+            return self._get_child(self._right_child_uuid).get_child(id)
+        else:
+            if self._left_child_uuid == None:
+                raise ValueError("Child not found")
+            return self._get_child(self._left_child_uuid).get_child(id)
+
     def add_child(self, child):
         """adds a child node to this tree"""
         if self == child:

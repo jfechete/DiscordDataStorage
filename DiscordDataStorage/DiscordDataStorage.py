@@ -12,3 +12,4 @@ if __name__ == "__main__":
     print(root.str_tree())"""
     root = TreeNode.TreeNode.get_node("0dfc638b-0add-4533-bc14-66c2ee758e43")
     print(root.str_tree())
+    print(root.get_child(28).str_tree())
