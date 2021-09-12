@@ -17,6 +17,7 @@ ID_KEY = "id"
 
 #Variables
 data_dir = os.path.join(os.path.split(__file__)[0],DEFAULT_DATA_DIR_NAME)
+_initialized = False
 
 #Main class
 class TreeNode:
@@ -31,6 +32,7 @@ class TreeNode:
     @classmethod
     def get_node(cls, uuid):
         """Reads a node from disk with the given uuid"""
+        _init()
         data = cls._get_node_data(uuid)
         uuid = data[UUID_KEY]
         data_uuid = data[DATA_UUID_KEY]
@@ -48,6 +50,7 @@ class TreeNode:
 
     @classmethod
     def _constructor(cls, uuid, data_uuid, id, left_child = None, right_child = None, self = None):
+        _init()
         if self == None:
             self = cls.__new__(cls)
 
@@ -175,7 +178,9 @@ def set_data_dir(dir):
     data_dir = dir
 
 def _init():
-    if not os.path.isdir(data_dir): # TODO: make this only trigger when data is written and default directory is used, so it doesn't make the folder if a different directory is set
+    global _initialized
+    if _initialized:
+        return
+    if data_dir != os.path.join(os.path.split(__file__)[0],DEFAULT_DATA_DIR_NAME) and not os.path.isdir(data_dir): # TODO: Test if this works
         os.mkdir(data_dir)
-
-_init()
+    _initialized = True
