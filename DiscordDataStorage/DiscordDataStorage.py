@@ -13,3 +13,8 @@ if __name__ == "__main__":
     root = TreeNode.TreeNode.get_node("0dfc638b-0add-4533-bc14-66c2ee758e43")
     print(root.str_tree())
     print(root.get_child(28).str_tree())
+    try:
+        root.get_child(29)
+        root.del_child(29)
+    except ValueError as e:
+        print("29 gone")

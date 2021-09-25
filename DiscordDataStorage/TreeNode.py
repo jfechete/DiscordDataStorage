@@ -99,6 +99,28 @@ class TreeNode:
             else:
                 self._get_child(self._left_child_uuid).add_child(child)
 
+    def del_child(self, id, parent = None, parent_side = None):
+        right_child = None if self._right_child_uuid == None else self._get_child(self._right_child_uuid)
+        left_child = None if self._left_child_uuid == None else self._get_child(self._left_child_uuid)
+        if self.id == id:
+            if right_child == None and left_child == None:
+                if parent == None:
+                    pass #TODO: design empty tree structure
+                else:
+                    if parent_side > 0:
+                        parent._right_child_uuid = None
+                    else:
+                        parent._left_child_uuid = None
+                    parent._save_node()
+            self._del_data()
+        else:
+            if self.id < id:
+                right_child.del_child(id, self, 1)
+            else:
+                left_child.del_child(id, self, -1)
+    
+    def _del_data(self):
+        pass
 
     def str_tree(self, first_start = "", body_start = ""):
         """gets a string representation of this node and it's children"""
