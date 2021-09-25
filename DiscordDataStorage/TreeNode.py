@@ -112,6 +112,13 @@ class TreeNode:
                     else:
                         parent._left_child_uuid = None
                     parent._save_node()
+            elif right_child == None or left_child == None:
+                child = right_child or left_child #TODO: design solution for when root is deleted (root may be referenced by other objects, can't change it)
+                if parent_side > 0:
+                    parent._right_child_uuid = child.uuid
+                else:
+                    parent._left_child_uuid = child.uuid
+                parent._save_node()
             self._del_data()
         else:
             if self.id < id:
