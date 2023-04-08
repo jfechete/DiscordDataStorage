@@ -10,8 +10,8 @@ class DataAccessor:
     def __init__(self, key,
         user_template=None, member_template=None,
         server_template=None, bot_template=None,
-        storage_location = "DiscordDataStorage",
-        salt = b""):
+        storage_location="DiscordDataStorage",
+        salt=b""):
         """Constructor for the object used to save and retrieve data
 
         The only required parameter is a key created using cryptography Fernet.
@@ -20,10 +20,9 @@ class DataAccessor:
         member_template - the template to use when retrieving member data
         server_template - the template to use when retrieving server data
         bot_template - the template to use when retrieving bot data
-        storage_location - specify a non-default storage location
+        storage_location - where to store the data files
         If a relative storage_location is given, it is joined with home.
         salt - the salt to use when creating user hashes
-        Defaults to empty bytes.
         """
         self._key = key
         self._fernet = Fernet(self._key)
@@ -36,7 +35,7 @@ class DataAccessor:
         if not os.path.isdir(self._storage_location):
             os.makedirs(self._storage_location)
 
-    def read(self, server_id = "", user_id = ""):
+    def read(self, server_id="", user_id=""):
         """Reads data
 
         Will raise a FileNotFoundError if the data doesn't exist and
@@ -48,10 +47,10 @@ class DataAccessor:
         returns the data read
         """
         template = self._get_template(server_id != "", user_id != "")
-        if template == None and not self.file_exists(server_id, user_id):
+        if template == None and not self.data_exists(server_id, user_id):
             raise FileNotFoundError("No data file found")
 
-        if not self.file_exists(server_id, user_id):
+        if not self.data_exists(server_id, user_id):
             data = copy.deepcopy(template)
         else:
             data = json.loads(self._read_file(server_id, user_id))
@@ -59,7 +58,7 @@ class DataAccessor:
                 DataAccessor._apply_template(data, template)
         return data
 
-    def write(self, data, server_id = "", user_id = ""):
+    def write(self, data, server_id="", user_id=""):
         """Writes data
 
         Optional keyword arguments:
@@ -68,18 +67,18 @@ class DataAccessor:
         """
         self._write_file(json.dumps(data), server_id, user_id)
 
-    def file_exists(self,  server_id = "", user_id = ""):
-        """Checks if a file exists
+    def data_exists(self,  server_id="", user_id=""):
+        """Checks if data exists
 
         Optional keyword arguments:
-        server_id - the server id of the file to check
-        user_id - the user id of the file to check
+        server_id - the server id of the data to check
+        user_id - the user id of the data to check
 
-        returns a boolean showing if the file exists
+        returns a boolean showing if the data exists
         """
         return os.path.isfile(self._get_file_path(server_id, user_id))
 
-    def _read_file(self, server_id = "", user_id = ""):
+    def _read_file(self, server_id="", user_id=""):
         """Reads data from a file
 
         Simply returns the unencrypted data in a file, without applying
@@ -94,7 +93,7 @@ class DataAccessor:
             data = data_file.read()
         return self._decrypt(data)
 
-    def _write_file(self, data, server_id = "", user_id = ""):
+    def _write_file(self, data, server_id="", user_id=""):
         """Writes data to a file
 
         Writes a string to a file in encrypted form
@@ -125,7 +124,7 @@ class DataAccessor:
         else:
             return self._member_template
 
-    def _get_file_path(self, server_id = "", user_id = ""):
+    def _get_file_path(self, server_id="", user_id=""):
         """Gets the file path for the file that stores some data
 
         Optional keyword arguments:
@@ -139,7 +138,7 @@ class DataAccessor:
             self._get_file_name(server_id, user_id)
         )
 
-    def _get_file_name(self, server_id = "", user_id = ""):
+    def _get_file_name(self, server_id="", user_id=""):
         """Gets the file name for the file that stores some data
 
         Optional keyword arguments:
