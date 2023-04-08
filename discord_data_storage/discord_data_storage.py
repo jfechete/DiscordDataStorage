@@ -10,7 +10,8 @@ class DataAccessor:
     def __init__(self, key,
         user_template=None, member_template=None,
         server_template=None, bot_template=None,
-        storage_location = "DiscordDataStorage"):
+        storage_location = "DiscordDataStorage",
+        salt = b""):
         """Constructor for the object used to save and retrieve data
 
         The only required parameter is a key created using cryptography Fernet.
@@ -21,6 +22,8 @@ class DataAccessor:
         bot_template - the template to use when retrieving bot data
         storage_location - specify a non-default storage location
         If a relative storage_location is given, it is joined with home.
+        salt - the salt to use when creating user hashes
+        Defaults to empty bytes.
         """
         self._key = key
         self._fernet = Fernet(self._key)
@@ -28,6 +31,7 @@ class DataAccessor:
         self._member_template = member_template
         self._server_template = server_template
         self._bot_template = bot_template
+        self._salt = salt
         self._storage_location = os.path.join(HOME_DIR,storage_location)
         if not os.path.isdir(self._storage_location):
             os.makedirs(self._storage_location)
@@ -44,10 +48,10 @@ class DataAccessor:
         returns the data read
         """
         template = self._get_template(server_id != "", user_id != "")
-        if template == None and not self._file_exists(server_id, user_id):
+        if template == None and not self.file_exists(server_id, user_id):
             raise FileNotFoundError("No data file found")
 
-        if not self._file_exists(server_id, user_id):
+        if not self.file_exists(server_id, user_id):
             data = copy.deepcopy(template)
         else:
             data = json.loads(self._read_file(server_id, user_id))
@@ -63,6 +67,17 @@ class DataAccessor:
         user_id - the user id of the data to write
         """
         self._write_file(json.dumps(data), server_id, user_id)
+
+    def file_exists(self,  server_id = "", user_id = ""):
+        """Checks if a file exists
+
+        Optional keyword arguments:
+        server_id - the server id of the file to check
+        user_id - the user id of the file to check
+
+        returns a boolean showing if the file exists
+        """
+        return os.path.isfile(self._get_file_path(server_id, user_id))
 
     def _read_file(self, server_id = "", user_id = ""):
         """Reads data from a file
@@ -90,17 +105,6 @@ class DataAccessor:
         data = self._encrypt(data)
         with open(self._get_file_path(server_id, user_id), "w") as data_file:
             data = data_file.write(data)
-
-    def _file_exists(self,  server_id = "", user_id = ""):
-        """Checks if a file exists
-
-        Optional keyword arguments:
-        server_id - the server id of the file to check
-        user_id - the user id of the file to check
-
-        returns a boolean showing if the file exists
-        """
-        return os.path.isfile(self._get_file_path(server_id, user_id))
 
     def _get_template(self, is_server, is_user):
         """Gets the correct template for some data
@@ -174,7 +178,7 @@ class DataAccessor:
 
         returns the hash as a hex string
         """
-        kdf = Scrypt(salt=self._key, length=32, n=2**14, r=8, p=1)
+        kdf = Scrypt(salt=self._salt, length=32, n=2**14, r=8, p=1)
         return kdf.derive(value.encode()).hex()
 
     @staticmethod
