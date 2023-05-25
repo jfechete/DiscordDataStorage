@@ -5,6 +5,7 @@ with open("README.md") as readme:
 
 setup(
     name = "discord_data_storage",
+    version = "0.1.0",
     description = "Encrypted data storage with a format based on Discord",
     long_description = long_description,
     long_description_content_type = "text/markdown",
