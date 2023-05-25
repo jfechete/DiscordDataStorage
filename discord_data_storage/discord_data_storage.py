@@ -67,6 +67,20 @@ class DataAccessor:
         """
         self._write_file(json.dumps(data), server_id, user_id)
 
+    def delete(self, server_id="", user_id=""):
+        """Deletes data
+
+        Deletes the data if it exists, does nothing if it doesn't.
+        Optional keyword arguments:
+        server_id - the server id of the data to delete
+        user_id - the user id of the data to delete
+        """
+        if self.data_exists(server_id=server_id, user_id=user_id):
+            os.remove(self._get_file_path(
+                server_id=server_id,
+                user_id=user_id
+            ))
+
     def data_exists(self,  server_id="", user_id=""):
         """Checks if data exists
 

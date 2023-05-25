@@ -35,6 +35,12 @@ data - the data to write <br />
 server_id - the server id of the data to write <br />
 user_id - the user id of the data to write <br />
  <br />
+`discord_data_storage.DataAccessor.delete(server_id="", user_id="")` <br />
+Deletes the data matching the given parameters if it exists. <br />
+**Parameters:** <br />
+server_id - the server id of the data to delete <br />
+user_id - the user id of the data to delete <br />
+ <br />
 `discord_data_storage.DataAccessor.data_exists(server_id="", user_id="")` <br />
 Checks if data exists for the given parameters. <br />
 **Parameters:** <br />
